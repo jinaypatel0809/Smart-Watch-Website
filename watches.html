@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Watches • SmartWatch Hub</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.12);
+        --text: #eaf0ff;
+        --muted: rgba(234, 240, 255, 0.72);
+        --brand: #6d5efc;
+        --brand2: #19d3ff;
+        --radius: 16px;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      }
+
+      /* Light theme overrides (same idea as index.html) */
+      html[data-theme="light"] {
+        --bg: #f6f8ff;
+        --card: rgba(0, 0, 0, 0.04);
+        --card-border: rgba(0, 0, 0, 0.10);
+        --text: #07101f;
+        --muted: rgba(7, 16, 31, 0.72);
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(1100px 700px at 25% -10%, rgba(109, 94, 252, 0.45), transparent 60%),
+          radial-gradient(900px 650px at 95% 10%, rgba(25, 211, 255, 0.32), transparent 55%),
+          var(--bg);
+      }
+
+      a { color: inherit; text-decoration: none; }
+      .container { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+        background: rgba(11, 18, 32, 0.7);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 16px; }
+      .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; white-space: nowrap; }
+      .logo-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--brand), var(--brand2));
+        box-shadow: 0 10px 24px rgba(109, 94, 252, 0.25);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: #07101f;
+      }
+      nav ul { list-style: none; display: flex; margin: 0; padding: 0; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
+      nav a { color: var(--muted); font-weight: 600; padding: 10px 12px; border-radius: 12px; transition: 180ms ease; }
+      nav a:hover, nav a:focus { color: var(--text); background: rgba(255,255,255,0.07); outline: none; }
+      nav a.active { color: var(--text); background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.12); }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: var(--muted);
+        cursor: pointer;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .theme-toggle:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+      html[data-theme="light"] .theme-toggle {
+        border-color: rgba(0,0,0,0.12);
+        background: rgba(0,0,0,0.04);
+      }
+
+      /* Mobile menu */
+      .menu-btn {
+        display: none;
+        width: 44px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: var(--muted);
+        cursor: pointer;
+        flex: 0 0 auto;
+      }
+      .menu-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+      html[data-theme="light"] .menu-btn {
+        border-color: rgba(0,0,0,0.12);
+        background: rgba(0,0,0,0.04);
+      }
+
+      .menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        display: none;
+        z-index: 55;
+      }
+      .menu-overlay.open { display: block; }
+
+      .mobile-menu {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        width: min(340px, 92vw);
+        background: rgba(11,18,32,0.94);
+        border-left: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        transform: translateX(105%);
+        transition: transform 180ms ease;
+        z-index: 65;
+        display: flex;
+        flex-direction: column;
+      }
+      .mobile-menu.open { transform: translateX(0); }
+      .mobile-menu-header {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .menu-close {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .mobile-menu-links {
+        padding: 16px;
+        display: grid;
+        gap: 10px;
+      }
+      .mobile-menu a {
+        display: block;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.05);
+        color: rgba(234,240,255,0.86);
+        font-weight: 800;
+      }
+      .mobile-menu a:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+      .mobile-menu a.active {
+        border: 0;
+        background: linear-gradient(135deg, var(--brand), var(--brand2));
+        color: #061122;
+      }
+
+      @media (max-width: 760px) {
+        header .nav-right nav { display: none; }
+        .menu-btn { display: inline-flex; }
+      }
+
+      .page {
+        padding: 26px 0 64px;
+      }
+
+      .title-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin: 24px 0 14px;
+      }
+      .title-row h1 { margin: 0; font-size: 24px; letter-spacing: -0.01em; }
+      .title-row span { color: var(--muted); font-size: 14px; }
+
+      /* Controls like index.html (single line, wrap on small screens) */
+      .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 12px 0 10px;
+        align-items: center;
+      }
+      .controls .input,
+      .controls .select {
+        width: 180px;
+      }
+      .controls .input.price {
+        width: 140px;
+      }
+
+      .btn-sm {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+      }
+      .btn-sm.primary { border: 0; background: linear-gradient(135deg, var(--brand), var(--brand2)); color: #061122; }
+      html[data-theme="light"] .btn-sm {
+        border-color: rgba(0,0,0,0.12);
+        background: rgba(0,0,0,0.04);
+      }
+
+      label {
+        font-weight: 800;
+        font-size: 13px;
+        color: rgba(234,240,255,0.88);
+      }
+
+      .input, .select {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: var(--text);
+        padding: 12px 12px;
+        border-radius: 14px;
+        outline: none;
+      }
+      .select option { background: #0b1220; }
+      .subrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+      .btn {
+        padding: 12px 14px;
+        border-radius: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+      }
+      .btn.primary { border: 0; background: linear-gradient(135deg, var(--brand), var(--brand2)); color: #061122; }
+
+      .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+      .card {
+        grid-column: span 3;
+        border: 1px solid var(--card-border);
+        background: var(--card);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+        transition: transform 140ms ease, border-color 140ms ease;
+      }
+      .card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.2); }
+
+      .card-img {
+        height: 260px;
+        background: rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+      .card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        background: rgba(0,0,0,0.12);
+      }
+      .card-body { padding: 14px; }
+      .card-name { margin: 0 0 6px; font-weight: 800; letter-spacing: -0.01em; }
+      .meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .price { font-weight: 800; }
+      .rating { color: rgba(234,240,255,0.9); font-weight: 800; display: inline-flex; align-items: center; gap: 6px; }
+      .rating .stars { display: inline-flex; gap: 3px; }
+      .rating .stars i { color: #ffd166; }
+      .hint { margin-top: 10px; color: var(--muted); font-size: 13px; }
+
+      .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .page-btn {
+        min-width: 42px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .page-btn[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .page-btn.active {
+        border: 0;
+        background: linear-gradient(135deg, var(--brand), var(--brand2));
+        color: #061122;
+      }
+
+      /* Footer (same as index.html) */
+      .site-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.10);
+        background: #05070d;
+        color: #eaf0ff;
+        margin-top: 48px;
+      }
+      .site-footer a { color: rgba(234,240,255,0.78); }
+      .site-footer a:hover { color: #eaf0ff; text-decoration: underline; }
+
+      .footer-top {
+        padding: 42px 0 28px;
+        display: grid;
+        grid-template-columns: 1.2fr 2fr 1.4fr;
+        gap: 36px;
+        align-items: start;
+      }
+
+      .footer-brand {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+      }
+      .footer-brand .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+      }
+      .footer-brand .brand .logo-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--brand), var(--brand2));
+        display: grid;
+        place-items: center;
+        color: #07101f;
+      }
+      .footer-brand .brand .name { font-size: 18px; }
+      .footer-brand .muted { color: rgba(234,240,255,0.72); line-height: 1.6; font-size: 14px; }
+
+      .footer-cols {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 26px;
+      }
+      .footer-col h4 {
+        margin: 0 0 12px;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .footer-links {
+        display: grid;
+        gap: 10px;
+        font-size: 14px;
+      }
+
+      .social { display: flex; gap: 10px; flex-wrap: wrap; }
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(234,240,255,0.86);
+        transition: 160ms ease;
+      }
+      .icon-btn:hover { color: #eaf0ff; border-color: rgba(255,255,255,0.22); transform: translateY(-1px); }
+
+      .footer-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .footer-mid {
+        border-top: 1px solid rgba(255,255,255,0.10);
+        padding: 14px 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: rgba(234,240,255,0.78);
+        font-size: 14px;
+      }
+      .footer-mid .sep { opacity: 0.5; }
+
+      .footer-payments {
+        border-top: 1px solid rgba(255,255,255,0.10);
+        padding: 14px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .pay-row { display: flex; gap: 10px; flex-wrap: wrap; }
+      .pay-pill {
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        color: rgba(234,240,255,0.86);
+      }
+      .copyright { color: rgba(234,240,255,0.70); font-size: 13px; }
+
+      .help-fab {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        width: 54px;
+        height: 54px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        cursor: pointer;
+        background: #ff6a00;
+        color: #0b1220;
+        box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+        z-index: 95;
+      }
+      .help-fab:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+      @media (max-width: 980px) {
+        .footer-top { grid-template-columns: 1fr; }
+        .footer-cols { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 560px) {
+        .footer-cols { grid-template-columns: 1fr; }
+        .footer-payments { justify-content: center; }
+      }
+
+      @media (max-width: 980px) {
+        .card { grid-column: span 6; }
+        .control.price { min-width: 320px; }
+      }
+      @media (max-width: 560px) {
+        .card { grid-column: span 12; }
+        .control { min-width: 100%; }
+        .control.price { min-width: 100%; }
+        .subrow { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="nav">
+          <a class="logo" href="./index.html#home" aria-label="SmartWatch Hub Home">
+            <span class="logo-badge">SW</span>
+            <span>SmartWatch Hub</span>
+          </a>
+
+          <div class="nav-right">
+            <button id="mobileMenuBtn" class="menu-btn" type="button" aria-label="Open menu">
+              <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
+            <nav aria-label="Primary">
+              <ul>
+                <li><a href="./index.html#home">Home</a></li>
+                <li><a class="active" href="./watches.html">Watches</a></li>
+                <li><a href="./index.html#upcoming">Upcoming</a></li>
+                <li><a href="./index.html#features">Features</a></li>
+                <li><a href="./index.html#login">Login</a></li>
+                <li><a href="./index.html#register">Register</a></li>
+              </ul>
+            </nav>
+
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark/light theme">
+              <i class="fa-solid fa-moon" aria-hidden="true"></i>
+              <span>Theme</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Menu (Drawer) -->
+    <div id="menuOverlay" class="menu-overlay" aria-hidden="true"></div>
+    <aside id="mobileMenu" class="mobile-menu" aria-label="Mobile menu" aria-hidden="true">
+      <div class="mobile-menu-header">
+        <div style="font-weight: 900;">Menu</div>
+        <button id="closeMenuBtn" class="menu-close" type="button">Close</button>
+      </div>
+      <div class="mobile-menu-links">
+        <a href="./index.html#home">Home</a>
+        <a class="active" href="./watches.html">Watches</a>
+        <a href="./index.html#upcoming">Upcoming</a>
+        <a href="./index.html#features">Features</a>
+        <a href="./index.html#login">Login</a>
+        <a href="./index.html#register">Register</a>
+      </div>
+    </aside>
+
+    <main class="page">
+      <div class="container">
+        <div class="title-row">
+          <h1>All Watches</h1>
+          <span id="resultsText">Loading...</span>
+        </div>
+
+        <section class="controls" aria-label="Filters">
+          <select id="brandSelect" class="select" aria-label="Filter by brand">
+            <option value="all" selected>Brand: All</option>
+          </select>
+
+          <input id="minPrice" class="input price" type="number" min="0" step="1" placeholder="Min Price" aria-label="Minimum price" />
+          <input id="maxPrice" class="input price" type="number" min="0" step="1" placeholder="Max Price" aria-label="Maximum price" />
+
+          <select id="ratingSelect" class="select" aria-label="Filter by minimum rating">
+            <option value="0" selected>Rating: All</option>
+            <option value="4">Rating: 4.0+</option>
+            <option value="4.5">Rating: 4.5+</option>
+            <option value="4.7">Rating: 4.7+</option>
+            <option value="4.8">Rating: 4.8+</option>
+          </select>
+
+          <button id="clearBtn" class="btn-sm" type="button" style="width: auto">Clear</button>
+        </section>
+
+        <div id="priceHint" class="hint" style="margin: 0 0 16px"></div>
+
+        <section>
+          <div id="grid" class="grid" aria-label="Watches grid"></div>
+          <div id="pagination" class="pagination" aria-label="Pagination"></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer" aria-label="Footer">
+      <div class="container">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <div class="brand" aria-label="Brand">
+              <span class="logo-badge">SW</span>
+              <span class="name">SmartWatch Hub</span>
+            </div>
+            <div class="muted">Premium smartwatches for fitness, productivity, and style.</div>
+            <div class="social" aria-label="Social links">
+              <a class="icon-btn" href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+              <a class="icon-btn" href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+              <a class="icon-btn" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+              <a class="icon-btn" href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+              <a class="icon-btn" href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-cols">
+            <div class="footer-col">
+              <h4>Customer Service</h4>
+              <div class="footer-links">
+                <a href="#">Payment Options</a>
+                <a href="#">Track Order</a>
+                <a href="#">Find a Store</a>
+                <a href="#">Loyalty Program</a>
+              </div>
+            </div>
+
+            <div class="footer-col">
+              <h4>Policies</h4>
+              <div class="footer-links">
+                <a href="#">Brand Protection</a>
+                <a href="#">Cancellation</a>
+                <a href="#">Shipping</a>
+                <a href="#">Warranty Policies</a>
+              </div>
+            </div>
+
+            <div class="footer-col">
+              <h4>Contact Us</h4>
+              <div class="footer-links">
+                <a href="tel:18002660123">1800-266-0123</a>
+                <a href="mailto:support@smartwatchhub.com">support@smartwatchhub.com</a>
+                <a href="#">FAQs</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h4>About SmartWatch Hub</h4>
+            <div class="footer-links">
+              <a href="#">About Us</a>
+              <a href="#">Help & Contact</a>
+              <a href="#">Careers</a>
+            </div>
+
+            <h4 style="margin-top: 18px;">Download the App</h4>
+            <div class="footer-badges" aria-label="App download">
+              <a class="badge" href="#" aria-label="Download on the App Store">
+                <i class="fa-brands fa-apple" aria-hidden="true"></i>
+                App Store
+              </a>
+              <a class="badge" href="#" aria-label="Get it on Google Play">
+                <i class="fa-brands fa-google-play" aria-hidden="true"></i>
+                Google Play
+              </a>
+            </div>
+
+            <h4 style="margin-top: 18px;">Need Help?</h4>
+            <div class="footer-links">
+              <a href="#" id="whatsAppLink">Chat with us on WhatsApp</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-mid" aria-label="Legal links">
+          <a href="#">Terms and Conditions</a>
+          <span class="sep">|</span>
+          <a href="#">Privacy Policy</a>
+        </div>
+
+        <div class="footer-payments" aria-label="Payments">
+          <div class="pay-row">
+            <span class="pay-pill">VISA</span>
+            <span class="pay-pill">MASTERCARD</span>
+            <span class="pay-pill">PAYPAL</span>
+            <span class="pay-pill">RUPAY</span>
+            <span class="pay-pill">AXIS</span>
+            <span class="pay-pill">ICICI</span>
+            <span class="pay-pill">DINERS</span>
+          </div>
+          <div class="copyright">© <span id="year"></span> SmartWatch Hub. All Rights Reserved.</div>
+        </div>
+      </div>
+    </footer>
+
+    <button id="helpFab" class="help-fab" type="button" aria-label="Need help">
+      <i class="fa-solid fa-comment" aria-hidden="true"></i>
+    </button>
+
+    <script>
+      // -------------------------------------
+      // Helpers
+      // -------------------------------------
+      const $ = (sel) => document.querySelector(sel);
+      const money = (n) => `$${Number(n).toFixed(0)}`;
+
+      // -----------------------------
+      // Theme (Dark/Light) - shared with index.html
+      // -----------------------------
+      const THEME_KEY = "swh_theme_v1";
+
+      function getSystemTheme() {
+        try {
+          return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        } catch {
+          return "dark";
+        }
+      }
+
+      function loadTheme() {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved === "light" || saved === "dark") return saved;
+        return getSystemTheme();
+      }
+
+      function updateThemeToggle(theme) {
+        const btn = $("#themeToggle");
+        if (!btn) return;
+        const icon = theme === "dark" ? "fa-sun" : "fa-moon";
+        btn.innerHTML = `<i class=\"fa-solid ${icon}\" aria-hidden=\"true\"></i><span>Theme</span>`;
+        btn.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+      }
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem(THEME_KEY, theme);
+        updateThemeToggle(theme);
+      }
+
+      function toggleTheme() {
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        setTheme(cur === "dark" ? "light" : "dark");
+      }
+
+      // -----------------------------
+      // Mobile Menu (Drawer)
+      // -----------------------------
+      function openMobileMenu() {
+        $("#menuOverlay")?.classList.add("open");
+        $("#mobileMenu")?.classList.add("open");
+        $("#menuOverlay")?.setAttribute("aria-hidden", "false");
+        $("#mobileMenu")?.setAttribute("aria-hidden", "false");
+      }
+
+      function closeMobileMenu() {
+        $("#menuOverlay")?.classList.remove("open");
+        $("#mobileMenu")?.classList.remove("open");
+        $("#menuOverlay")?.setAttribute("aria-hidden", "true");
+        $("#mobileMenu")?.setAttribute("aria-hidden", "true");
+      }
+
+      function stars(rating) {
+        const full = Math.floor(rating);
+        const half = rating - full >= 0.5 ? 1 : 0;
+        const empty = 5 - full - half;
+
+        const fullStars = Array.from({ length: full }, () => `<i class=\"fa-solid fa-star\" aria-hidden=\"true\"></i>`).join("");
+        const halfStar = half ? `<i class=\"fa-solid fa-star-half-stroke\" aria-hidden=\"true\"></i>` : "";
+        const emptyStars = Array.from({ length: empty }, () => `<i class=\"fa-regular fa-star\" aria-hidden=\"true\"></i>`).join("");
+        return `<span class=\"stars\" aria-hidden=\"true\">${fullStars}${halfStar}${emptyStars}</span>`;
+      }
+
+      // -------------------------------------
+      // DATA (same style as index.html)
+      // NOTE: If you want, later we can move this into a separate data.js file.
+      // -------------------------------------
+      const WATCHES = [
+        {
+          id: "Apple Watch SE 2",
+          name: "Apple Watch SE 2",
+          brand: "Apple",
+          price: 249,
+          rating: 4.5,
+          tag: "Retina • GPS",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/k/c/7/-original-imah4jmydtzdqvmz.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Series 9",
+          name: "Apple Watch Series 9",
+          brand: "Apple",
+          price: 399,
+          rating: 4.8,
+          tag: "Always-on • GPS",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/7/r/e/45-mr993hn-a-ios-apple-yes-original-imagterzzu4fsrqg.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Ultra",
+          name: "Apple Watch Ultra",
+          brand: "Apple",
+          price: 799,
+          rating: 4.9,
+          tag: "Titanium • GPS + Cellular",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/7/6/p/-original-imah4jm9ycgmwg2e.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Series 8",
+          name: "Apple Watch Series 8",
+          brand: "Apple",
+          price: 349,
+          rating: 4.7,
+          tag: "ECG • Temperature",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/d/r/n/-original-imaghxg3wwp5fkgm.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Nike",
+          name: "Apple Watch Nike",
+          brand: "Apple",
+          price: 379,
+          rating: 4.6,
+          tag: "Nike Bands • GPS",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/w/i/a/-original-imahftggemvtfpvu.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Hermes",
+          name: "Apple Watch Hermes",
+          brand: "Apple",
+          price: 1249,
+          rating: 4.8,
+          tag: "Luxury • Cellular",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/z/n/y/-original-imah4jmyeghvba7u.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Series 7",
+          name: "Apple Watch Series 7",
+          brand: "Apple",
+          price: 299,
+          rating: 4.6,
+          tag: "Larger Display • Fast Charge",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/ku8pbbk0/smartwatch/x/w/8/ios-mkhw3hn-a-apple-yes-original-imag7eqypz9zkbn3.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Apple Watch Series 6",
+          name: "Apple Watch Series 6",
+          brand: "Apple",
+          price: 279,
+          rating: 4.5,
+          tag: "SpO2 • Always-On",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/kfeamq80/smartwatch/g/h/4/ios-m00j3hn-a-apple-original-imafvvggyswtz7yu.jpeg?q=70",
+          ],
+        },
+        {
+          id: "ColorFit Ultra",
+          name: "ColorFit Ultra",
+          brand: "Noise",
+          price: 99,
+          rating: 4.5,
+          tag: "AMOLED • Fitness",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/w/m/u/-original-imah39dusvdhezk5.jpeg?q=70",
+          ],
+        },
+        {
+          id: "ColorFit Pro 4",
+          name: "ColorFit Pro 4",
+          brand: "Noise",
+          price: 109,
+          rating: 4.6,
+          tag: "AMOLED • Bluetooth",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/l2z26q80/smartwatch/8/q/a/43-688-wrb-sw-colorfitpro4-std-blk-blu-android-ios-noise-yes-original-image6yxqzgnugxh.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Noise Icon 2",
+          name: "Noise Icon 2",
+          brand: "Noise",
+          price: 79,
+          rating: 4.4,
+          tag: "Bluetooth • Calling",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/q/a/n/45-72-wrb-sw-colorfiticon2-2025-std-blk-blk-android-ios-noise-original-imahe6dt3gazezmm.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Noise Evolve 3",
+          name: "Noise Evolve 3",
+          brand: "Noise",
+          price: 129,
+          rating: 4.7,
+          tag: "AMOLED • Premium",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/t/c/a/-original-imagzw9t5svbsuyw.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Noise Force Rugged",
+          name: "Noise Force Rugged",
+          brand: "Noise",
+          price: 119,
+          rating: 4.5,
+          tag: "Rugged • Outdoor",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/screen-guard/nano-glass/6/o/5/rr-36-257-kong-fu-ma-smartwatch-original-imagwfpj9f8z6gph.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Noise Vivid Call",
+          name: "Noise Vivid Call",
+          brand: "Noise",
+          price: 69,
+          rating: 4.3,
+          tag: "Calling • Smart",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/xif0q/smartwatch/z/f/6/-original-imah759hrk24uyjw.jpeg?q=70",
+          ],
+        },
+        {
+          id: "ColorFit Quad",
+          name: "ColorFit Quad",
+          brand: "Noise",
+          price: 89,
+          rating: 4.4,
+          tag: "AMOLED • Quad",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/kzn17680/smartwatch/4/g/j/1-69-android-ios-w9quad-aqfit-yes-original-imagbhqrpehdxwrx.jpeg?q=70",
+          ],
+        },
+        {
+          id: "Noise Fit Active",
+          name: "Noise Fit Active",
+          brand: "Noise",
+          price: 59,
+          rating: 4.2,
+          tag: "Fitness • Budget",
+          images: [
+            "https://rukminim2.flixcart.com/image/612/612/kolsscw0/smartwatch/e/e/v/wrb-sw-active-std-gry-android-ios-noise-original-imag3f7qzpfsw2b9.jpeg?q=70",
+          ],
+        },
+      ];
+
+      // -------------------------------------
+      // State
+      // -------------------------------------
+      const PAGE_SIZE = 8;
+      let currentPage = 1;
+
+      // -------------------------------------
+      // Filters
+      // -------------------------------------
+      function getBrands() {
+        return Array.from(new Set(WATCHES.map((w) => w.brand).filter(Boolean))).sort();
+      }
+
+      function getPriceBounds() {
+        const prices = WATCHES.map((w) => Number(w.price)).filter((n) => Number.isFinite(n));
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        return { min, max };
+      }
+
+      function readFilters() {
+        const brand = $("#brandSelect").value;
+        const ratingMin = Number($("#ratingSelect").value || 0);
+
+        const minPriceRaw = $("#minPrice").value;
+        const maxPriceRaw = $("#maxPrice").value;
+
+        let minPrice = minPriceRaw === "" ? null : Number(minPriceRaw);
+        let maxPrice = maxPriceRaw === "" ? null : Number(maxPriceRaw);
+
+        if (minPrice !== null && minPrice < 0) minPrice = 0;
+        if (maxPrice !== null && maxPrice < 0) maxPrice = 0;
+        if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+          // If user accidentally swapped, fix it.
+          [minPrice, maxPrice] = [maxPrice, minPrice];
+        }
+
+        return { brand, ratingMin, minPrice, maxPrice };
+      }
+
+      function applyFilters(list) {
+        const { brand, ratingMin, minPrice, maxPrice } = readFilters();
+
+        return list.filter((w) => {
+          if (brand !== "all" && (w.brand || "").toLowerCase() !== brand.toLowerCase()) return false;
+          if (Number(w.rating) < ratingMin) return false;
+          if (minPrice !== null && Number(w.price) < minPrice) return false;
+          if (maxPrice !== null && Number(w.price) > maxPrice) return false;
+          return true;
+        });
+      }
+
+      // -------------------------------------
+      // Rendering
+      // -------------------------------------
+      function renderGrid(pageItems) {
+        $("#grid").innerHTML = pageItems
+          .map((w) => {
+            const cover = (w.images && w.images[0]) ? w.images[0] : "https://via.placeholder.com/900x600?text=Smartwatch";
+            return `
+              <article class=\"card\">
+                <div class=\"card-img\" role=\"img\" aria-label=\"${w.name} product image\">
+                  <img
+                    src=\"${cover}\"
+                    alt=\"${w.name}\"
+                    loading=\"lazy\"
+                    onerror=\"this.onerror=null; this.src='https://via.placeholder.com/900x600?text=Smartwatch';\"
+                  />
+                </div>
+                <div class=\"card-body\">
+                  <h3 class=\"card-name\">${w.name}</h3>
+                  <div class=\"meta\">
+                    <div class=\"price\">${money(w.price)}</div>
+                    <div class=\"rating\" aria-label=\"Rating ${w.rating} out of 5\">
+                      ${stars(w.rating)}
+                      <span>${Number(w.rating).toFixed(1)}</span>
+                    </div>
+                  </div>
+                  <div class=\"hint\">${w.tag || ""} • ${w.brand || ""}</div>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function renderPagination(totalItems) {
+        const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+        currentPage = Math.min(currentPage, totalPages);
+
+        const buttons = [];
+
+        // Prev
+        buttons.push(
+          `<button class=\"page-btn\" data-page=\"${currentPage - 1}\" ${currentPage === 1 ? "disabled" : ""} aria-label=\"Previous page\">` +
+          `<i class=\"fa-solid fa-chevron-left\" aria-hidden=\"true\"></i>` +
+          `</button>`
+        );
+
+        // Page numbers (compact)
+        const windowSize = 2;
+        const start = Math.max(1, currentPage - windowSize);
+        const end = Math.min(totalPages, currentPage + windowSize);
+
+        if (start > 1) {
+          buttons.push(`<button class=\"page-btn\" data-page=\"1\">1</button>`);
+          if (start > 2) buttons.push(`<span style=\"color: var(--muted); display:inline-flex; align-items:center;\">…</span>`);
+        }
+
+        for (let p = start; p <= end; p++) {
+          buttons.push(
+            `<button class=\"page-btn ${p === currentPage ? "active" : ""}\" data-page=\"${p}\">${p}</button>`
+          );
+        }
+
+        if (end < totalPages) {
+          if (end < totalPages - 1) buttons.push(`<span style=\"color: var(--muted); display:inline-flex; align-items:center;\">…</span>`);
+          buttons.push(`<button class=\"page-btn\" data-page=\"${totalPages}\">${totalPages}</button>`);
+        }
+
+        // Next
+        buttons.push(
+          `<button class=\"page-btn\" data-page=\"${currentPage + 1}\" ${currentPage === totalPages ? "disabled" : ""} aria-label=\"Next page\">` +
+          `<i class=\"fa-solid fa-chevron-right\" aria-hidden=\"true\"></i>` +
+          `</button>`
+        );
+
+        $("#pagination").innerHTML = buttons.join("");
+      }
+
+      function render() {
+        const filtered = applyFilters(WATCHES);
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        currentPage = Math.min(currentPage, totalPages);
+
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+        $("#resultsText").textContent = `${filtered.length} result(s) • Page ${currentPage}/${totalPages}`;
+        renderGrid(pageItems);
+        renderPagination(filtered.length);
+      }
+
+      // -------------------------------------
+      // Wiring
+      // -------------------------------------
+      function init() {
+        // Footer year
+        $("#year") && ($("#year").textContent = new Date().getFullYear());
+
+        // Apply saved/system theme
+        setTheme(loadTheme());
+        $("#themeToggle")?.addEventListener("click", toggleTheme);
+
+        // Mobile menu
+        $("#mobileMenuBtn")?.addEventListener("click", openMobileMenu);
+        $("#closeMenuBtn")?.addEventListener("click", closeMobileMenu);
+        $("#menuOverlay")?.addEventListener("click", closeMobileMenu);
+        $("#mobileMenu")?.addEventListener("click", (e) => {
+          const a = e.target.closest("a");
+          if (a) closeMobileMenu();
+        });
+
+        // ESC closes menu
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeMobileMenu();
+        });
+
+        // Footer help
+        $("#helpFab")?.addEventListener("click", () => {
+          document.querySelector("footer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        $("#whatsAppLink")?.addEventListener("click", (e) => {
+          e.preventDefault();
+        });
+
+        // Fill brands
+        const brands = getBrands();
+        $("#brandSelect").innerHTML = `<option value=\"all\" selected>Brand: All</option>` + brands
+          .map((b) => `<option value=\"${b}\">${b}</option>`)
+          .join("");
+
+        // Price hint
+        const { min, max } = getPriceBounds();
+        $("#priceHint").textContent = `Tip: in our list prices are between ${money(min)} and ${money(max)}.`;
+
+        // Filter changes -> reset page
+        ["#brandSelect", "#ratingSelect", "#minPrice", "#maxPrice"].forEach((id) => {
+          $(id).addEventListener("input", () => {
+            currentPage = 1;
+            render();
+          });
+          $(id).addEventListener("change", () => {
+            currentPage = 1;
+            render();
+          });
+        });
+
+        $("#clearBtn").addEventListener("click", () => {
+          $("#brandSelect").value = "all";
+          $("#ratingSelect").value = "0";
+          $("#minPrice").value = "";
+          $("#maxPrice").value = "";
+          currentPage = 1;
+          render();
+        });
+
+        $("#pagination").addEventListener("click", (e) => {
+          const btn = e.target.closest("button[data-page]");
+          if (!btn || btn.disabled) return;
+          const page = Number(btn.getAttribute("data-page"));
+          if (!Number.isFinite(page)) return;
+          currentPage = page;
+          render();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        render();
+      }
+
+      init();
+    </script>
+  </body>
+</html>
